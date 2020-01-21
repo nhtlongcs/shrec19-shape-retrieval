@@ -28,5 +28,5 @@ blender -b -P <path to script>
 blender -b -P '/home/ken/scripts blender/run.py'
 ```
 # Extracted Data
-	- [Link google drive](https://drive.google.com/drive/folders/1-JIGt7aIjtBkBxnA2kHeXaSDpMEhuno5?usp=sharing)
+[Link google drive](https://drive.google.com/drive/folders/1-JIGt7aIjtBkBxnA2kHeXaSDpMEhuno5?usp=sharing)
 
