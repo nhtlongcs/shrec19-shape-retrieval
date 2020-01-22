@@ -1,11 +1,12 @@
 # shrec19-shape-retrieval
-# Required 
+## Requirements
+ 
 
 ```
 Blender 2.79
 Python 3.x
 ```
-# Folder structure
+## Folder structure
 
 ```
 	<output_data_folder>
@@ -19,7 +20,7 @@ Python 3.x
 		
 ```
 
-# Usage
+## Usage
 ```
 blender -b -P <path to script>
 ```
@@ -27,6 +28,6 @@ blender -b -P <path to script>
 ```
 blender -b -P '/home/ken/scripts blender/run.py'
 ```
-# Extracted Data
-	- [Link google drive](https://drive.google.com/drive/folders/1-JIGt7aIjtBkBxnA2kHeXaSDpMEhuno5?usp=sharing)
+## Extracted Data
+[Link google drive](https://drive.google.com/drive/folders/1-JIGt7aIjtBkBxnA2kHeXaSDpMEhuno5?usp=sharing)
 
