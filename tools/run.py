@@ -1,13 +1,12 @@
+import os
+import sys
 import bpy
-import numpy as np
+import time
+import glob
 import math
 import mathutils
-import time
+import numpy as np
 from mathutils import Vector
-
-import sys
-import os
-import glob
 
 test_path = ''
 train_path = ''
@@ -56,7 +55,7 @@ class Scene(object):
 
     def add_lighting(self, location):
         lamp_data = bpy.data.lamps.new(name="New Lamp", type='POINT')
-        lamp_data.energy = 0.5
+        lamp_data.energy = 0.25
 
         # Create new object with our lamp datablock
         lamp_object = bpy.data.objects.new(
@@ -77,12 +76,12 @@ class Scene(object):
         self.target = bpy.context.selected_objects[0]  # <--Fix
         self.target
 
-    def new_camera(self):
+    def new_camera(self, camera_location):
         cam = bpy.data.cameras.new("Camera")
         cam.lens = 18
 
         self.camera = bpy.data.objects.new("Camera", cam)
-        self.camera.location = (0, -1, 0)
+        self.camera.location = camera_location
         self.camera.rotation_euler = (90, 0, 0)
         main_scene.camera = self.camera
         main_scene.objects.link(self.camera)
@@ -130,7 +129,14 @@ def rotateCamera(scene):
     camera.location = np.dot(cameraOrigin, rotationMatrix)
 
 
-def take_a_snap(obj_path, output_path):
+def setRotate():
+    print("start")
+    bpy.app.handlers.frame_change_pre.clear()
+    bpy.app.handlers.frame_change_pre.append(rotateCamera)
+    bpy.ops.render.render(animation=True)
+
+
+def take_a_snap(obj_path, output_path, camera_location=(0, -1, 0)):
 
     # check blender version == 2.79
     print(bpy.app.version_string)
@@ -139,12 +145,13 @@ def take_a_snap(obj_path, output_path):
     scene.add_to_scene(obj_path)
 
     scene.normalize()
-    for x in range(2):
-        for y in range(2):
-            location = (pow(-1, x), pow(-1, y), 1)
-            scene.add_lighting(location)
+    for z in [-1, 1]:
+        for x in range(2):
+            for y in range(2):
+                location = (pow(-1, x), pow(-1, y), z)
+                scene.add_lighting(location)
 
-    scene.new_camera()
+    scene.new_camera(camera_location)
     global delta
     delta = scene.delta
     global camera
@@ -153,13 +160,6 @@ def take_a_snap(obj_path, output_path):
     cameraOrigin = np.array(camera.location)
 
     setRotate()
-
-
-def setRotate():
-    print("start")
-    bpy.app.handlers.frame_change_pre.clear()
-    bpy.app.handlers.frame_change_pre.append(rotateCamera)
-    bpy.ops.render.render(animation=True)
 
 
 class ShrecDataset(object):
@@ -203,19 +203,36 @@ class ShrecDataset(object):
 
     def export_2d(self):
         for i in range(len(self)):
-            # for i in range((5)):
+            # for i in range(2):
             obj_path = self.root + 'data/' + (self[i][0])
-            output_path = self.root + 'output/' + \
-                str(self[i][1]) + '/' + \
+            output_path = str(self[i][1]) + '/' + \
                 self[i][0].split('/')[1].split('.')[0] + '/'
 
             # print(obj_path)
             # print(output_path)
-            take_a_snap(obj_path, output_path)
+
+            cnt = 0
+
+            for i in [4, -4]:
+
+                z = math.sin(math.pi/i)
+                y = math.cos(math.pi/i)
+                take_a_snap(obj_path,
+                            self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, y, z))
+                cnt += 1
+
+            take_a_snap(obj_path,
+                        self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, -1, 0))
 
 
 if __name__ == "__main__":
+    # Get the scene
+    scene = bpy.data.scenes["Scene"]
+
+    # Set render resolution
+    scene.render.resolution_x = 224
+    scene.render.resolution_y = 244
+    scene.render.resolution_percentage = 100
+
     dataset = ShrecDataset(root="/home/ken/Downloads/shrec2019/")
     dataset.export_2d()
-
-# run code by cmd : blender -b -P '/home/ken/scripts blender/run.py'

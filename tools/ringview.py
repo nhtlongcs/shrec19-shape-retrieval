@@ -7,8 +7,8 @@ from mathutils import Vector
 
 main_scene = bpy.context.scene
 delta = 0
-cameraOrigin
-camera
+cameraOrigin = None
+camera = None
 
 
 def reset_blend():
@@ -48,7 +48,7 @@ class Scene(object):
 
     def add_lighting(self, location):
         lamp_data = bpy.data.lamps.new(name="New Lamp", type='POINT')
-        lamp_data.energy = 0.5
+        lamp_data.energy = 0.25
 
         # Create new object with our lamp datablock
         lamp_object = bpy.data.objects.new(
@@ -69,12 +69,12 @@ class Scene(object):
         self.target = bpy.context.selected_objects[0]  # <--Fix
         self.target
 
-    def new_camera(self):
+    def new_camera(self, camera_location):
         cam = bpy.data.cameras.new("Camera")
         cam.lens = 18
 
         self.camera = bpy.data.objects.new("Camera", cam)
-        self.camera.location = (0, -1, 0)
+        self.camera.location = camera_location
         self.camera.rotation_euler = (90, 0, 0)
         main_scene.camera = self.camera
         main_scene.objects.link(self.camera)
@@ -129,7 +129,7 @@ def setRotate():
     bpy.ops.render.render(animation=True)
 
 
-def take_a_snap(obj_path, output_path):
+def take_a_snap(obj_path, output_path, camera_location=(0, -1, 0)):
 
     # check blender version == 2.79
     print(bpy.app.version_string)
@@ -138,12 +138,13 @@ def take_a_snap(obj_path, output_path):
     scene.add_to_scene(obj_path)
 
     scene.normalize()
-    for x in range(2):
-        for y in range(2):
-            location = (pow(-1, x), pow(-1, y), 1)
-            scene.add_lighting(location)
+    for z in [-1, 1]:
+        for x in range(2):
+            for y in range(2):
+                location = (pow(-1, x), pow(-1, y), z)
+                scene.add_lighting(location)
 
-    scene.new_camera()
+    scene.new_camera(camera_location)
     global delta
     delta = scene.delta
     global camera
@@ -152,7 +153,16 @@ def take_a_snap(obj_path, output_path):
     cameraOrigin = np.array(camera.location)
 
     setRotate()
+# example
+# cnt = 0
+# for i in [4,-4]:
 
+#     z = math.sin(math.pi/i)
+#     y = math.cos(math.pi/i)
+
+#     take_a_snap('/home/ken/Downloads/shrec2019/data/3D_OBJ/3i4gf2he1.obj',
+#                 '/home/ken/scripts blender/test/'+str(cnt) + '/', (0, y, z))
+#     cnt += 1
 
 # take_a_snap('/home/ken/Downloads/shrec2019/data/3D_OBJ/3i4gf2he1.obj',
-#             '/home/ken/scripts blender/test/1/')
+#             '/home/ken/scripts blender/test/'+str(cnt) + '/', (0, -1, 0))

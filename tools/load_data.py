@@ -2,7 +2,8 @@ import sys
 import os
 import numpy as np
 import glob
-from ringview import take_a_snap
+import math
+# from ringview import take_a_snap
 
 test_path = ''
 train_path = ''
@@ -49,16 +50,27 @@ class ShrecDataset(object):
         return len(self.list)
 
     def export_2d(self):
-        for i in range(len(self)):
-            # for i in range(len(5)):
+        # for i in range(len(self)):
+        for i in range(5):
             obj_path = self.root + 'data/' + (self[i][0])
-            output_path = self.root + 'output/' + \
-                str(self[i][1]) + '/' + \
+            output_path = str(self[i][1]) + '/' + \
                 self[i][0].split('/')[1].split('.')[0] + '/'
+            #
+            print(obj_path)
+            print(output_path)
 
-            # print(obj_path)
-            # print(output_path)
-            take_a_snap(obj_path, output_path)
+            cnt = 0
+
+            for i in [4, -4]:
+
+                z = math.sin(math.pi/i)
+                y = math.cos(math.pi/i)
+                take_a_snap(obj_path,
+                            self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, y, z))
+                cnt += 1
+
+            take_a_snap(obj_path,
+                        self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, -1, 0))
 
 
 if __name__ == "__main__":
