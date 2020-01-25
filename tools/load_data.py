@@ -65,12 +65,14 @@ class ShrecDataset(object):
 
                 z = math.sin(math.pi/i)
                 y = math.cos(math.pi/i)
-                take_a_snap(obj_path,
-                            self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, y, z))
+                print(self.root + 'output/ring' + str(cnt) + '/' + output_path)
+                # take_a_snap(obj_path,
+                #             self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, y, z))
                 cnt += 1
 
-            take_a_snap(obj_path,
-                        self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, -1, 0))
+            print(self.root + 'output/ring' + str(cnt) + '/' + output_path)
+            # take_a_snap(obj_path,
+            #             self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, -1, 0))
 
 
 if __name__ == "__main__":
