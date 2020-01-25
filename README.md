@@ -9,7 +9,7 @@ Python 3.x
 ## Folder structure
 
 ```
-	<data_after_split>
+<data_after_split>
 	|- data
     |- query
       |- train
