@@ -11,13 +11,14 @@ Python 3.x
 ```
 	<output_data_folder>
 	
-	|- class_i
-		|- obj
-			|- 0001.png
-			|- 0002.png
-			|- ...
+	|- ringview_i
+		|- class_i
+			|- obj
+				|- 0001.png
+				|- 0002.png
+				|- ...
+		|- ...
 	|- ...
-		
 ```
 
 ## Usage
