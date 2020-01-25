@@ -10,7 +10,7 @@ Python 3.x
 
 ```
 <data_after_split>
-	|- data
+  |- data
     |- query
       |- train
         |- class_i
