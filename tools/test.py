@@ -152,7 +152,6 @@ def take_a_snap(obj_path, output_path, camera_location=(0, -1, 0)):
     camera = bpy.data.objects['Camera']
     cameraOrigin = np.array(camera.location)
     # depth mode
-
     bpy.context.scene.use_nodes = True
     tree = bpy.context.scene.node_tree
     links = tree.links
@@ -183,9 +182,37 @@ def take_a_snap(obj_path, output_path, camera_location=(0, -1, 0)):
     links.new(rl.outputs[1], depthViewer.inputs[1])
 
     fileOutput = tree.nodes.new(type="CompositorNodeOutputFile")
-    fileOutput.base_path = output_path
+    fileOutput.base_path = output_path + '/Depth'
     links.new(invert.outputs[0], fileOutput.inputs[0])
 
+    # depth mode
+
+    # clear default nodes
+
+    # create input render layer node
+    rl2 = tree.nodes.new('CompositorNodeRLayers')
+
+    map2 = tree.nodes.new(type="CompositorNodeMapValue")
+    # Size is chosen kind of arbitrarily, try out until you're satisfied with resulting depth map.
+    map2.size = [0.8]
+    map2.use_min = True
+    map2.min = [0]
+    map2.use_max = True
+    map2.max = [255]
+    links.new(rl2.outputs[2], map2.inputs[0])
+
+    invert = tree.nodes.new(type="CompositorNodeInvert")
+    links.new(map2.outputs[0], invert.inputs[1])
+
+    # The viewer can come in handy for inspecting the results in the GUI
+    maskViewer = tree.nodes.new(type="CompositorNodeViewer")
+    links.new(invert.outputs[0], maskViewer.inputs[0])
+    # Use alpha from input.
+    links.new(rl2.outputs[1], maskViewer.inputs[1])
+
+    maskOutput = tree.nodes.new(type="CompositorNodeOutputFile")
+    maskOutput.base_path = output_path + '/mask'
+    links.new(invert.outputs[0], maskOutput.inputs[0])
     setRotate()
 
 

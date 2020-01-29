@@ -1,2 +1,2 @@
-from .cnnlstm import *
+from .sequence import *
 from .resnet import *

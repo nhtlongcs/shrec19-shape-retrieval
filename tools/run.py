@@ -140,7 +140,7 @@ def take_a_snap(obj_path, output_path, camera_location=(0, -1, 0)):
 
     # check blender version == 2.79
     print(bpy.app.version_string)
-    scene = Scene(render_path=output_path)
+    scene = Scene(render_path=output_path+'/render/Image####.png')
 
     scene.add_to_scene(obj_path)
 
@@ -158,6 +158,71 @@ def take_a_snap(obj_path, output_path, camera_location=(0, -1, 0)):
     global cameraOrigin
     camera = bpy.data.objects['Camera']
     cameraOrigin = np.array(camera.location)
+
+    # depth mode
+
+    bpy.context.scene.use_nodes = True
+    tree = bpy.context.scene.node_tree
+    links = tree.links
+
+    # clear default nodes
+    for n in tree.nodes:
+        tree.nodes.remove(n)
+
+    # create input render layer node
+    rl = tree.nodes.new('CompositorNodeRLayers')
+
+    map = tree.nodes.new(type="CompositorNodeMapValue")
+    # Size is chosen kind of arbitrarily, try out until you're satisfied with resulting depth map.
+    map.size = [0.7]
+    map.use_min = True
+    map.min = [0]
+    map.use_max = True
+    map.max = [1]
+    links.new(rl.outputs[2], map.inputs[0])
+
+    invert = tree.nodes.new(type="CompositorNodeInvert")
+    links.new(map.outputs[0], invert.inputs[1])
+
+    # The viewer can come in handy for inspecting the results in the GUI
+    depthViewer = tree.nodes.new(type="CompositorNodeViewer")
+    links.new(invert.outputs[0], depthViewer.inputs[0])
+    # Use alpha from input.
+    links.new(rl.outputs[1], depthViewer.inputs[1])
+
+    fileOutput = tree.nodes.new(type="CompositorNodeOutputFile")
+    fileOutput.base_path = output_path + 'depth/'
+    links.new(invert.outputs[0], fileOutput.inputs[0])
+    ##########################################################
+
+    # mask mode
+
+    # clear default nodes
+
+    # create input render layer node
+    rl2 = tree.nodes.new('CompositorNodeRLayers')
+
+    map2 = tree.nodes.new(type="CompositorNodeMapValue")
+    # Size is chosen kind of arbitrarily, try out until you're satisfied with resulting depth map.
+    map2.size = [0.00001]
+    map2.use_min = True
+    map2.min = [0]
+    map2.use_max = True
+    map2.max = [255]
+    links.new(rl2.outputs[2], map2.inputs[0])
+
+    invert = tree.nodes.new(type="CompositorNodeInvert")
+    links.new(map2.outputs[0], invert.inputs[1])
+
+    # The viewer can come in handy for inspecting the results in the GUI
+    maskViewer = tree.nodes.new(type="CompositorNodeViewer")
+    links.new(invert.outputs[0], maskViewer.inputs[0])
+    # Use alpha from input.
+    links.new(rl2.outputs[1], maskViewer.inputs[1])
+
+    maskOutput = tree.nodes.new(type="CompositorNodeOutputFile")
+    maskOutput.base_path = output_path + 'mask/'
+    links.new(invert.outputs[0], maskOutput.inputs[0])
 
     setRotate()
 
@@ -203,7 +268,7 @@ class ShrecDataset(object):
 
     def export_2d(self):
         for i in range(len(self)):
-            # for i in range(2):
+            # for i in range(1):
             obj_path = self.root + 'data/' + (self[i][0])
             output_path = str(self[i][1]) + '/' + \
                 self[i][0].split('/')[1].split('.')[0] + '/'
@@ -214,15 +279,15 @@ class ShrecDataset(object):
             cnt = 0
 
             for i in [4, -4]:
+                for k in range(1, 5):
+                    z = math.sin(math.pi/i*k)
+                    y = math.cos(math.pi/i*k)
+                    take_a_snap(obj_path,
+                                self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, y, z))
+                    cnt += 1
 
-                z = math.sin(math.pi/i)
-                y = math.cos(math.pi/i)
-                take_a_snap(obj_path,
-                            self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, y, z))
-                cnt += 1
-
-            take_a_snap(obj_path,
-                        self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, -1, 0))
+            # take_a_snap(obj_path,
+            #             self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, -1, 0))
 
 
 if __name__ == "__main__":

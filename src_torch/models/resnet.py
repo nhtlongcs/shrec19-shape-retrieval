@@ -1,5 +1,4 @@
 from torch import nn
-
 __all__ = ['ResNet']
 
 

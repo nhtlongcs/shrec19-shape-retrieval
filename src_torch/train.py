@@ -32,5 +32,8 @@ train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_data, batch_size=batch_size)
 
 # train
+
+torch.manual_seed(1)  # set random seed
+
 for epoch in range(epochs):
     pass
