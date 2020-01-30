@@ -46,6 +46,12 @@ blender -b -P '/home/ken/scripts blender/run.py'
 <p align="center">
   <img src="example/data/output/ring0/0/plane/depth/Image0001.png">
   <img src="example/data/output/ring0/0/plane/mask/Image0001.png">
-  <img src="example/data/output/ring0/0/plane/render/Image0001.png">
+  <img src="example/data/output/ring0/0/plane/render/Image0001.png"> <br />
+  <img src="example/data/output/ring0/0/plane/depth/Image0002.png">
+  <img src="example/data/output/ring0/0/plane/mask/Image0006.png">
+  <img src="example/data/output/ring0/0/plane/render/Image0006.png"> <br />
+  <img src="example/data/output/ring0/0/plane/depth/Image0011.png">
+  <img src="example/data/output/ring0/0/plane/mask/Image0011.png">
+  <img src="example/data/output/ring0/0/plane/render/Image0011.png"> <br />
 </p>
 
