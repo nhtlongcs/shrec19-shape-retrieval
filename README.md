@@ -9,16 +9,26 @@ Python 3.x
 ## Folder structure
 
 ```
-	<output_data_folder>
-	
-	|- ringview_i
-		|- class_i
-			|- obj
-				|- 0001.png
-				|- 0002.png
+<output_data_folder>
+
+|- ringview_i
+	|- class_i
+		|- obj_i			
+			|- depth
+				|- Image0001.png
+				|- Image0002.png
+				|- ...
+			|- mask
+				|- Image0001.png
+				|- Image0002.png
+				|- ...
+			|- render
+				|- Image0001.png
+				|- Image0002.png
 				|- ...
 		|- ...
 	|- ...
+|- ...
 ```
 
 ## Usage
