@@ -4,14 +4,32 @@ from torch.utils.data import DataLoader, random_split
 import torchvision.transforms as tf
 from torch.optim import Adam
 from torch import nn, manual_seed
+import tqdm
+import sys
+import argparse
 
-n_epochs = 1000
-batch_size = 128
-lr = 0.001
+
+def parse_cmd_args():
+    parser = argparse.ArgumentParser(
+        description='run the procedure of advice opinion extraction')
+    parser.add_argument('-p', '--path', type=str,
+                        default='/home/ken/Downloads/shrec2019/output/ring0/', help='config file path')
+    parser.add_argument('-b', '--batch_size', type=int,
+                        default=32, help='batchsize with each epochs')
+    parser.add_argument('-n', '--n_epochs', type=int,
+                        default=5, help='Total epochs')
+    parser.add_argument('-l', '--lr', type=float,
+                        default=0.001, help='learning rate')
+    args = parser.parse_args()
+    return args
+
 
 if __name__ == "__main__":
-
-    manual_seed(1)  # set random seed
+    config = parse_cmd_args()
+    n_epochs = config.n_epochs
+    batch_size = config.batch_size
+    lr = config.lr
+    dataset_path = config.path
 
     dummytf = tf.Compose(
         [
@@ -23,21 +41,37 @@ if __name__ == "__main__":
         ]
     )
 
-    dataset = shrec19(
-        '/home/ken/Downloads/shrec2019/output/ring0/', train=True, DummyTransform=dummytf)
+    dataset = shrec19(dataset_path, train=True, DummyTransform=dummytf)
 
     train_len = int(len(dataset) * 0.9)
     val_len = len(dataset) - train_len
 
     train_set, val_set = random_split(dataset, [train_len, val_len])
-    print(len(train_set))
-    # train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 
     model = CnnLstm().to('cuda')
     criterion = nn.CrossEntropyLoss().to('cuda')
     optimizer = Adam(model.parameters())
 
-    outputs = model(train_set[0][0].to('cuda'))
-    print(outputs.cpu().shape)
-    for epoch in range(n_epochs):
-        pass
+    with tqdm.tqdm(total=len(range(n_epochs)), file=sys.stdout) as pbar:
+        # for e in tqdm.tqdm(range(n_epochs)):
+        for i, data in enumerate(train_loader, 0):
+            inputs, labels = data
+            inputs = inputs.to('cuda')
+            labels = labels.to('cuda')
+            # zero the parameter gradients
+            optimizer.zero_grad()
+
+            # forward + backward + optimize
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            pbar.update(batch_size/train_len/n_epochs)
+            # print statistics
+        print(loss)
+    print('Finished Training {}'.format(loss))
+
+    torch.save(model.state_dict(), './baseline.pth')
