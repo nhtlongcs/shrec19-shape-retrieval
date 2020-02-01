@@ -1,39 +1,43 @@
-from torch.utils.data import DataLoader, random_split
-from torch import nn
-from torchvision.transforms import Compose
-from torch.optim import Adam
-from utils import *
 from models import *
+from utils import *
+from torch.utils.data import DataLoader, random_split
+import torchvision.transforms as tf
+from torch.optim import Adam
+from torch import nn, manual_seed
 
-epochs = 1000
+n_epochs = 1000
 batch_size = 128
 lr = 0.001
 
-transform_train = Compose(
-    [
-    ]
-)
+if __name__ == "__main__":
 
-transform_val = Compose(
-    [
-    ]
-)
+    manual_seed(1)  # set random seed
 
+    dummytf = tf.Compose(
+        [
+            tf.Resize(256),
+            tf.CenterCrop(224),
+            tf.ToTensor(),
+            tf.Normalize(mean=[0.485, 0.456, 0.406], std=[
+                0.229, 0.224, 0.225]),
+        ]
+    )
 
-model = CnnLstm()
-optimizer = Adam(model.parameters(), lr=lr)
+    dataset = shrec19(
+        '/home/ken/Downloads/shrec2019/output/ring0/', train=True, DummyTransform=dummytf)
 
-train_data = shrec19(
-    '/home/ken/Downloads/shrec2019/output/ring0/', train=True)
-val_data = shrec19(
-    '/home/ken/Downloads/shrec2019/output/ring0/', train=False)
+    train_len = int(len(dataset) * 0.9)
+    val_len = len(dataset) - train_len
 
-train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-val_loader = DataLoader(val_data, batch_size=batch_size)
+    train_set, val_set = random_split(dataset, [train_len, val_len])
+    print(len(train_set))
+    # train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 
-# train
+    model = CnnLstm().to('cuda')
+    criterion = nn.CrossEntropyLoss().to('cuda')
+    optimizer = Adam(model.parameters())
 
-torch.manual_seed(1)  # set random seed
-
-for epoch in range(epochs):
-    pass
+    outputs = model(train_set[0][0].to('cuda'))
+    print(outputs.cpu().shape)
+    for epoch in range(n_epochs):
+        pass
