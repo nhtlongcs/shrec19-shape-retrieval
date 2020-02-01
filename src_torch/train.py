@@ -69,7 +69,7 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
 
-            pbar.update(batch_size/train_len/n_epochs)
+            pbar.update(batch_size/train_len/n_epochs * 100)
             # print statistics
         print(loss)
     print('Finished Training {}'.format(loss))
