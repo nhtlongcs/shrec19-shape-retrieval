@@ -20,6 +20,8 @@ def parse_cmd_args():
                         default=32, help='batchsize with each epochs')
     parser.add_argument('-n', '--n_epochs', type=int,
                         default=5, help='Total epochs')
+    parser.add_argument('-s', '--seed', type=int,
+                        default=212, help='random state')
     parser.add_argument('-l', '--lr', type=float,
                         default=0.001, help='learning rate')
     args = parser.parse_args()
@@ -27,11 +29,13 @@ def parse_cmd_args():
 
 
 if __name__ == "__main__":
+
     config = parse_cmd_args()
     n_epochs = config.n_epochs
     batch_size = config.batch_size
     lr = config.lr
     dataset_path = config.path
+    manual_seed(config.seed)
 
     dummytf = tf.Compose(
         [
