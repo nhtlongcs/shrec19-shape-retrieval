@@ -1,5 +1,6 @@
 from models import *
 from utils import *
+import torch
 from torch.utils.data import DataLoader, random_split
 import torchvision.transforms as tf
 from torch.optim import Adam
@@ -7,6 +8,7 @@ from torch import nn, manual_seed
 import tqdm
 import sys
 import argparse
+from torch.utils.tensorboard import SummaryWriter
 
 
 def parse_cmd_args():
@@ -49,12 +51,13 @@ if __name__ == "__main__":
     train_set, val_set = random_split(dataset, [train_len, val_len])
 
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    writer = SummaryWriter()
 
     model = CnnLstm().to('cuda')
     criterion = nn.CrossEntropyLoss().to('cuda')
     optimizer = Adam(model.parameters())
-
-    with tqdm.tqdm(total=len(range(n_epochs)), file=sys.stdout) as pbar:
+    count = 0
+    with tqdm.tqdm(total=len(range(100)), file=sys.stdout) as pbar:
         # for e in tqdm.tqdm(range(n_epochs)):
         for i, data in enumerate(train_loader, 0):
             inputs, labels = data
@@ -69,9 +72,16 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
 
-            pbar.update(batch_size/train_len/n_epochs * 100)
             # print statistics
-        print(loss)
+            writer.add_scalar('Loss/train', loss.cpu().item(),
+                              i + count*(train_len/batch_size))
+
+            progress = float("{:.3f}".format(
+                batch_size/train_len/n_epochs*100.0))
+            pbar.update(progress)
+        count += 1
+
     print('Finished Training {}'.format(loss))
+    writer.close()
 
     torch.save(model.state_dict(), './baseline.pth')
