@@ -58,30 +58,29 @@ if __name__ == "__main__":
     optimizer = Adam(model.parameters())
     count = 0
     with tqdm.tqdm(total=len(range(100)), file=sys.stdout) as pbar:
-        # for e in tqdm.tqdm(range(n_epochs)):
-        for i, data in enumerate(train_loader, 0):
-            inputs, labels = data
-            inputs = inputs.to('cuda')
-            labels = labels.to('cuda')
-            # zero the parameter gradients
-            optimizer.zero_grad()
+        for e in range(n_epochs):
+            for i, data in enumerate(train_loader, 0):
+                inputs, labels = data
+                inputs = inputs.to('cuda')
+                labels = labels.to('cuda')
+                # zero the parameter gradients
+                optimizer.zero_grad()
 
-            # forward + backward + optimize
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
+                # forward + backward + optimize
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
 
-            # print statistics
-            writer.add_scalar('Loss/train', loss.cpu().item(),
-                              i + count*(train_len/batch_size))
+                # print statistics
+                writer.add_scalar('Loss/train', loss,
+                                  i + e*(train_len/batch_size))
 
-            progress = float("{:.3f}".format(
-                batch_size/train_len/n_epochs*100.0))
-            pbar.update(progress)
-        count += 1
+                progress = float("{:.3f}".format(
+                    batch_size/train_len/n_epochs*100.0))
+                pbar.update(progress)
 
     print('Finished Training {}'.format(loss))
-    writer.close()
+    # writer.close()
 
     torch.save(model.state_dict(), './baseline.pth')
