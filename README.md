@@ -5,11 +5,9 @@
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
-## Requirements
- 
-
-
 </p>
+
+## Requirements
 ```
 Blender 2.79
 Python 3.x
