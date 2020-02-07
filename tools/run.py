@@ -233,8 +233,8 @@ class ShrecDataset(object):
     def __init__(self, root, train=True, filter_empty=True):
         super().__init__()
         self.root = root
-        test_path = root + 'split/shrec2019_Model_test.txt'
-        train_path = root + 'split/shrec2019_Model_train.txt'
+        test_path = root + 'list/model_train.txt'
+        train_path = root + 'list/model_train.txt'
         output_path = root + 'output/'
         self.list = []
 
@@ -269,7 +269,7 @@ class ShrecDataset(object):
     def export_2d(self):
         for i in range(len(self)):
             # for i in range(1):
-            obj_path = self.root + 'data/' + (self[i][0])
+            obj_path = self.root + (self[i][0])
             output_path = str(self[i][1]) + '/' + \
                 self[i][0].split('/')[1].split('.')[0] + '/'
 
@@ -299,5 +299,6 @@ if __name__ == "__main__":
     scene.render.resolution_y = 244
     scene.render.resolution_percentage = 100
 
-    dataset = ShrecDataset(root="/home/ken/Downloads/shrec2019/")
+    dataset = ShrecDataset(
+        root="/home/ken/Downloads/shrec2020-data-supervise/supervise/")
     dataset.export_2d()
