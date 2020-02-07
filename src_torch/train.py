@@ -1,23 +1,23 @@
-from models import *
-from utils import *
+import sys
+import tqdm
 import torch
-from torch.utils.data import DataLoader, random_split
+import argparse
 import torchvision.transforms as tf
+from utils import *
+from models import *
 from torch.optim import Adam
 from torch import nn, manual_seed
-import tqdm
-import sys
-import argparse
 from torch.utils.tensorboard import SummaryWriter
+from torch.utils.data import DataLoader, random_split
 
 
 def parse_cmd_args():
     parser = argparse.ArgumentParser(
         description='run the procedure of advice opinion extraction')
     parser.add_argument('-p', '--path', type=str,
-                        default='/home/ken/Downloads/shrec2019/output/ring0/', help='config file path')
+                        default='/home/ken/Downloads/shrec2019/output/ring', help='config file path')
     parser.add_argument('-b', '--batch_size', type=int,
-                        default=32, help='batchsize with each epochs')
+                        default=1, help='batchsize with each epochs')
     parser.add_argument('-n', '--n_epochs', type=int,
                         default=5, help='Total epochs')
     parser.add_argument('-s', '--seed', type=int,
@@ -46,9 +46,7 @@ if __name__ == "__main__":
                 0.229, 0.224, 0.225]),
         ]
     )
-
     dataset = shrec19(dataset_path, train=True, DummyTransform=dummytf)
-
     train_len = int(len(dataset) * 0.9)
     val_len = len(dataset) - train_len
 
@@ -61,10 +59,13 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss().to('cuda')
     optimizer = Adam(model.parameters())
     count = 0
+
+    # model(dataset[0][0])
     with tqdm.tqdm(total=len(range(100)), file=sys.stdout) as pbar:
         for e in range(n_epochs):
             for i, data in enumerate(train_loader, 0):
                 inputs, labels = data
+
                 inputs = inputs.to('cuda')
                 labels = labels.to('cuda')
                 # zero the parameter gradients
@@ -80,9 +81,8 @@ if __name__ == "__main__":
                 writer.add_scalar('Loss/train', loss,
                                   i + e*(train_len/batch_size))
 
-                progress = float("{:.3f}".format(
-                    batch_size/train_len/n_epochs*100.0))
-                pbar.update(progress)
+                pbar.update(float("{:.3f}".format(
+                    batch_size/train_len/n_epochs*100.0)))
 
     print('Finished Training {}'.format(loss))
     # writer.close()

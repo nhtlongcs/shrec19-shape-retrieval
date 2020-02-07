@@ -13,13 +13,13 @@ __all__ = ['ResNet']
 class ResNet(nn.Module):
     """Some Information about ResNet"""
 
-    def __init__(self, pretrained=True):
+    def __init__(self, pretrained=True, freeze=True):
         super(ResNet, self).__init__()
         self.pretrained = pretrained
         self.model = resnet50(pretrained=pretrained)
-
-        for param in self.model.parameters():
-            param.requires_grad_(False)
+        if (freeze):
+            for param in self.model.parameters():
+                param.requires_grad_(False)
 
     def _init_weights(self):
         if (self.pretrained):
@@ -41,6 +41,7 @@ class ResNet(nn.Module):
 
         x = self.model.avgpool(x)
         x = flatten(x, 1)
+        # print(x.shape)
         return x
 
 
