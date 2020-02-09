@@ -18,6 +18,12 @@ cameraOrigin = None
 camera = None
 
 
+def log(index):
+    f = open("save.txt", "w+")
+    f.write("%d" % (index))
+    f.close()
+
+
 def reset_blend():
 
     for scene in bpy.data.scenes:
@@ -267,11 +273,13 @@ class ShrecDataset(object):
         return len(self.list)
 
     def export_2d(self):
-        for i in range(len(self)):
+        f = open("save.txt", "r")
+        start = int(f.read())
+        for id in range(start, len(self)):
             # for i in range(1):
-            obj_path = self.root + (self[i][0])
-            output_path = str(self[i][1]) + '/' + \
-                self[i][0].split('/')[1].split('.')[0] + '/'
+            obj_path = self.root + (self[id][0])
+            output_path = str(self[id][1]) + '/' + \
+                self[id][0].split('/')[1].split('.')[0] + '/'
 
             # print(obj_path)
             # print(output_path)
@@ -288,6 +296,7 @@ class ShrecDataset(object):
 
             # take_a_snap(obj_path,
             #             self.root + 'output/ring' + str(cnt) + '/' + output_path, (0, -1, 0))
+            log(id)
 
 
 if __name__ == "__main__":
