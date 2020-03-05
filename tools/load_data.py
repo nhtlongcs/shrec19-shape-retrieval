@@ -16,8 +16,8 @@ class ShrecDataset(object):
     def __init__(self, root, train=True, filter_empty=True):
         super().__init__()
         self.root = root
-        test_path = root + 'split/shrec2019_Model_test.txt'
-        train_path = root + 'split/shrec2019_Model_train.txt'
+        test_path = root + 'list/model_train.txt'
+        train_path = root + 'list/model_train.txt'
         output_path = root + 'output/'
         self.list = []
 
@@ -35,7 +35,7 @@ class ShrecDataset(object):
         f.close()
 
     def __getitem__(self, index):
-        obj = self.list[index][0]
+        obj = self.root + self.list[index][0]
 
         if self.is_train:
             label = self.list[index][1]
@@ -76,5 +76,7 @@ class ShrecDataset(object):
 
 
 if __name__ == "__main__":
-    dataset = ShrecDataset(root="/home/ken/Downloads/shrec2019/")
-    dataset.export_2d()
+    dataset = ShrecDataset(
+        root="/home/ken/Downloads/shrec2020-data-supervise/supervise/")
+    print(dataset[0])
+    # dataset.export_2d()
