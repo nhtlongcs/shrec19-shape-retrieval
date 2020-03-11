@@ -19,7 +19,7 @@ camera = None
 
 
 def log(index):
-    f = open("/home/ken/scripts blender/shrec19-shape-retrieval/tools/save.txt", "w+")
+    f = open("/home/nhtlong/blender/shrec19-shape-retrieval/tools/save.txt", "w+")
     f.write("%d" % (index))
     f.close()
 
@@ -274,7 +274,7 @@ class ShrecDataset(object):
         return len(self.list)
 
     def export_2d(self):
-        f = open("/home/ken/scripts blender/shrec19-shape-retrieval/tools/save.txt", "r")
+        f = open("/home/nhtlong/blender/shrec19-shape-retrieval/tools/save.txt", "r")
         start = int(f.read())
         # for id in range(start, len(self)):
         for id in range(start, 1):
@@ -331,6 +331,6 @@ if __name__ == "__main__":
     scene.render.resolution_percentage = 100
 
     dataset = ShrecDataset(
-        root="/home/ken/Downloads/shrec2020-data-supervise/supervise/")
+        root="/home/nhtlong/supervise/")
     # dataset.test()
     dataset.export_2d()
